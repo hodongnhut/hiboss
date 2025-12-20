@@ -1,0 +1,7 @@
+{
+  "name": "Chào Sếp - CRM & Marketing Automation ",
+  "description": "Hệ thống CRM và Marketing đa kênh tự động hóa (Call, SMS, Zalo, Email) tích hợp AI phân loại khách hàng.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
