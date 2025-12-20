@@ -28,25 +28,25 @@ export enum KenhMarketing {
 
 // Interface Tổ Chức (Doanh Nghiệp mua phần mềm)
 export interface ToChuc {
-    id: string;
-    tenToChuc: string; // VD: Bất Động Sản Hưng Thịnh
-    maSoThue?: string;
-    goiDichVu: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
-    ngayHetHan: string;
-    trangThai: 'ACTIVE' | 'LOCKED';
+  id: string;
+  tenToChuc: string; // VD: Bất Động Sản Hưng Thịnh
+  maSoThue?: string;
+  goiDichVu: 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+  ngayHetHan: string;
+  trangThai: 'ACTIVE' | 'LOCKED';
 }
 
 // User Interface (Nhân viên thuộc tổ chức)
 export interface NguoiDung {
-    id: string;
-    toChucId: string; // Link user với tổ chức
-    hoTen: string;
-    email: string;
-    soDienThoai?: string;
-    vaiTro: VaiTro;
-    trangThai: 'ACTIVE' | 'INACTIVE';
-    avatarUrl?: string;
-    ngayTao: string;
+  id: string;
+  toChucId: string; // Link user với tổ chức
+  hoTen: string;
+  email: string;
+  soDienThoai?: string;
+  vaiTro: VaiTro;
+  trangThai: 'ACTIVE' | 'INACTIVE';
+  avatarUrl?: string;
+  ngayTao: string;
 }
 
 // Interface Khách Hàng (Lead) - Phải thuộc về 1 tổ chức
@@ -59,20 +59,24 @@ export interface KhachHang {
   soDienThoai: string;
   email: string;
   diaChi: string;
-  nganhNghe?: string; 
+  nganhNghe?: string;
   trangThai: TrangThaiKhachHang;
   nguonGoc: 'SYSTEM' | 'UPLOAD';
   ghiChu?: string;
   ngayTao: string;
+  tax_code: string;
+  is_active: boolean;
+  address: string;
+  website: string;
 }
 
 // Interface Nhóm Khách Hàng (Segment)
 export interface NhomKhachHang {
-    id: string;
-    tenNhom: string;
-    soLuong: number;
-    moTa?: string;
-    ngayTao: string;
+  id: string;
+  tenNhom: string;
+  soLuong: number;
+  moTa?: string;
+  ngayTao: string;
 }
 
 // Interface Chiến Dịch
@@ -107,20 +111,20 @@ export interface MauTinNhan {
 
 // Transaction Interface
 export interface GiaoDich {
-    id: string;
-    loai: 'NAP_TIEN' | 'TRU_PHI';
-    soTien: number;
-    noiDung: string;
-    thoiGian: string;
-    trangThai: 'THANH_CONG' | 'THAT_BAI';
+  id: string;
+  loai: 'NAP_TIEN' | 'TRU_PHI';
+  soTien: number;
+  noiDung: string;
+  thoiGian: string;
+  trangThai: 'THANH_CONG' | 'THAT_BAI';
 }
 
 // Interface Thông Báo (Notification)
 export interface ThongBao {
-    id: string;
-    tieuDe: string;
-    noiDung: string;
-    loai: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
-    thoiGian: string; // ISO String
-    daXem: boolean;
+  id: string;
+  tieuDe: string;
+  noiDung: string;
+  loai: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+  thoiGian: string; // ISO String
+  daXem: boolean;
 }

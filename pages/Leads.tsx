@@ -1,5 +1,5 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Upload, Search, Filter, MoreHorizontal, Users, Save, Share2, UserCheck, CheckSquare, Square, ChevronLeft, ChevronRight, Loader2, AlertCircle, MapPin, X } from 'lucide-react';
+import { Upload, Search, Filter, MoreHorizontal, Database, X, Check, MapPin, Loader2, Eye, Edit3, Trash2, Building2, Calendar, CreditCard, Phone, Mail, Globe, Briefcase, CheckSquare, Square, ChevronLeft, ChevronRight, Share2, Save } from 'lucide-react';
 import { danhSachUserMau, toChucHienTai } from '../services/mockData';
 import { phanLoaiNganhNghe, fetchCompanies } from '../services/aiService';
 import { TrangThaiKhachHang, KhachHang, VaiTro } from '../types';
@@ -25,6 +25,9 @@ const Leads = () => {
 
     // UI States
     const [isImporting, setIsImporting] = useState(false);
+
+    const [selectedLead, setSelectedLead] = useState<any | null>(null);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
     const [newGroupName, setNewGroupName] = useState('');
@@ -59,6 +62,10 @@ const Leads = () => {
                     trangThai: TrangThaiKhachHang.MOI,
                     ngayTao: item.created_at || new Date().toISOString(),
                     nguonGoc: 'SYSTEM',
+                    tax_code: item.tax_code,
+                    is_active: item.is_active,
+                    address: item.address,
+                    website: item.website
                 }));
 
                 setLeads(mappedLeads);
@@ -90,6 +97,13 @@ const Leads = () => {
         'Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
         'Bình Dương', 'Đồng Nai', 'Quảng Ninh', 'Vĩnh Phúc', 'Khác'
     ];
+
+    const handleOpenDetail = (lead: any) => {
+        console.log(lead)
+        setSelectedLead(lead);
+        setIsDetailOpen(true);
+    };
+
 
     const handleSelectAll = () => {
         selectedLeadIds.size === leads.length
@@ -127,7 +141,7 @@ const Leads = () => {
                         <Upload size={18} /> Import Excel
                     </button>
                     <button onClick={() => setIsFilterOpen(!isFilterOpen)} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold border shadow-sm transition ${isFilterOpen ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'}`}>
-                        <Filter size={18} /> {isFilterOpen ? 'Đóng Lọc' : 'Bộ Lọc AI'}
+                        <Filter size={18} /> {isFilterOpen ? 'Đóng Lọc' : 'Bộ Lọc'}
                     </button>
                 </div>
             </div>
@@ -236,8 +250,10 @@ const Leads = () => {
                                                 <MapPin size={12} className="shrink-0" /> {lead.diaChi}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <button className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-lg text-slate-400 transition-colors"><MoreHorizontal size={20} /></button>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <button onClick={() => handleOpenDetail(lead)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all" title="Xem chi tiết"><Eye size={18} /></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )) : (
@@ -299,6 +315,103 @@ const Leads = () => {
                         <div className="p-6 border-t border-slate-200 dark:border-slate-700 flex gap-4 bg-slate-50/50">
                             <button onClick={() => setIsGroupModalOpen(false)} className="flex-1 py-3 border border-slate-200 rounded-2xl text-slate-500 font-black text-xs uppercase tracking-widest hover:bg-white transition-all">Hủy</button>
                             <button onClick={handleSaveGroup} className="flex-1 py-3 bg-purple-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2"><Save size={18} /> Lưu Nhóm</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isDetailOpen && selectedLead && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-4xl rounded-[40px] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 flex flex-col max-h-[90vh]">
+                        {/* Header Dialog */}
+                        <div className="p-8 border-b border-slate-200 dark:border-slate-700 flex justify-between items-start bg-gradient-to-br from-blue-50 to-white dark:from-slate-800 dark:to-slate-800 shrink-0">
+                            <div className="flex gap-6">
+                                <div className="w-16 h-16 bg-blue-600 rounded-3xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20"><Building2 size={32} /></div>
+                                <div>
+                                    <h2 className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight leading-none mb-2">{selectedLead.company_name}</h2>
+                                    <div className="flex flex-wrap gap-2">
+                                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-blue-200">MST: {selectedLead.tax_code}</span>
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${selectedLead.is_active === 1 ? 'bg-green-100 text-green-700 border-green-200' : 'bg-red-100 text-red-700 border-red-200'}`}>{selectedLead.is_active === 1 ? 'ACTIVE' : 'INACTIVE'}</span>
+                                        <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-purple-200">ID: {selectedLead.id}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button onClick={() => setIsDetailOpen(false)} className="p-2 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-2xl transition-all"><X size={24} /></button>
+                        </div>
+
+                        {/* Body Dialog */}
+                        <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-6">
+                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b pb-2">Hồ sơ doanh nghiệp</h3>
+                                    <div className="space-y-4">
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Tên Doanh Nghiệp</p>
+                                            <p className="font-bold text-slate-700 dark:text-slate-300 uppercase">{selectedLead.tenCongTy || '-- CHƯA CẬP NHẬT --'}</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><Calendar size={12} /> Thành lập</p>
+                                                <p className="font-bold text-slate-700 dark:text-slate-300">{selectedLead.ngayTao || '--'}</p>
+                                            </div>
+                                            <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase mb-1 flex items-center gap-1"><CreditCard size={12} /> Vốn điều lệ</p>
+                                                <p className="font-bold text-slate-700 dark:text-slate-300">{selectedLead.capital ? `${selectedLead.capital.toLocaleString()} VND` : '--'}</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Người đại diện pháp luật</p>
+                                            <p className="font-bold text-slate-700 dark:text-slate-300 uppercase">{selectedLead.nguoiLienHe || '-- ĐANG CẬP NHẬT --'}</p>
+                                        </div>
+                                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Ngành Nghề</p>
+                                            <p className="font-bold text-slate-700 dark:text-slate-300 uppercase">{selectedLead.nganhNghe || '-- ĐANG CẬP NHẬT --'}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="space-y-6">
+                                    <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] border-b pb-2">Liên hệ & Vị trí</h3>
+                                    <div className="space-y-4">
+                                        <div className="bg-blue-50/50 dark:bg-blue-900/10 p-5 rounded-3xl border border-blue-100/50 dark:border-blue-800/30">
+                                            <div className="flex items-start gap-4">
+                                                <div className="p-3 bg-blue-600 rounded-2xl text-white"><MapPin size={20} /></div>
+                                                <div>
+                                                    <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase mb-1">Địa chỉ đăng ký</p>
+                                                    <p className="font-bold text-slate-700 dark:text-slate-300 leading-tight">{selectedLead.address}</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-wider">{selectedLead.province}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-700 transition-colors hover:bg-white">
+                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500"><Phone size={18} /></div>
+                                                <div className="flex-1"><p className="text-[10px] font-black text-slate-400 uppercase">Điện thoại</p><p className="font-bold font-mono text-slate-800 dark:text-slate-200">{selectedLead.soDienThoai || '-- CHƯA CÓ --'}</p></div>
+                                                {selectedLead.soDienThoai && <button className="p-2 bg-blue-600 text-white rounded-xl shadow-lg active:scale-95"><Phone size={16} /></button>}
+                                            </div>
+                                            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-700 transition-colors hover:bg-white">
+                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500"><Mail size={18} /></div>
+                                                <div className="flex-1"><p className="text-[10px] font-black text-slate-400 uppercase">Hòm thư (Email)</p><p className="font-bold text-slate-800 dark:text-slate-200">{selectedLead.email || '-- CHƯA CÓ --'}</p></div>
+                                            </div>
+                                            <div className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-slate-100 dark:border-slate-700 transition-colors hover:bg-white">
+                                                <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-500"><Globe size={18} /></div>
+                                                <div className="flex-1"><p className="text-[10px] font-black text-slate-400 uppercase">Trang web</p><p className="font-bold text-slate-800 dark:text-slate-200">{selectedLead.website || '-- CHƯA CÓ --'}</p></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer Dialog */}
+                        <div className="p-8 border-t border-slate-200 dark:border-slate-700 bg-slate-50/50 flex flex-col md:flex-row justify-between gap-4 shrink-0">
+                            <div className="flex gap-3">
+                                <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all"><Phone size={16} /> Gọi tư vấn</button>
+                                <button className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all"><Share2 size={16} /> Chia cho Sale</button>
+                            </div>
+                            <div className="flex gap-3">
+                                <button className="px-6 py-3 bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-2xl font-black text-xs text-slate-500 dark:text-slate-300 uppercase tracking-widest hover:bg-slate-50 transition-all"><Save size={16} className="inline mr-2" /> Cập nhật</button>
+                                <button onClick={() => setIsDetailOpen(false)} className="px-6 py-3 bg-slate-200 dark:bg-slate-700 rounded-2xl font-black text-xs text-slate-600 dark:text-slate-300 uppercase tracking-widest hover:bg-slate-300 transition-all">Đóng</button>
+                            </div>
                         </div>
                     </div>
                 </div>
