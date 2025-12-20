@@ -94,7 +94,7 @@ const Leads = () => {
 
     // Danh sách tỉnh thành cố định hoặc lấy từ dữ liệu mẫu
     const uniqueCities = [
-        'Hà Nội', 'TP.HCM', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
+        'Hà Nội', 'TP Hồ Chí Minh', 'Đà Nẵng', 'Hải Phòng', 'Cần Thơ',
         'Bình Dương', 'Đồng Nai', 'Quảng Ninh', 'Vĩnh Phúc', 'Khác'
     ];
 
