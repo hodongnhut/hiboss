@@ -6,8 +6,8 @@ interface LoginProps {
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
-  const [username, setUsername] = useState('admin@chaosep.com');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
