@@ -9,7 +9,7 @@ export const toChucHienTai: ToChuc = {
     trangThai: 'ACTIVE'
 };
 
-// Mock Users (Nhân viên của tổ chức này)
+
 export const danhSachUserMau: NguoiDung[] = [
     {
         id: 'US001',
