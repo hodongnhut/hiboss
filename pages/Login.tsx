@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { Lock, Loader2, AlertCircle, User, ShieldCheck, Globe, Eye, EyeOff } from 'lucide-react';
+import { Lock, Loader2, AlertCircle, User, ShieldCheck, Globe, Eye, EyeOff, Terminal, Zap, ArrowLeft, Mail, Send, CheckCircle2 } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
 }
+type AuthView = 'LOGIN' | 'FORGOT_PASSWORD' | 'FORGOT_SUCCESS';
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const [view, setView] = useState<AuthView>('LOGIN');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [emailReset, setEmailReset] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,105 +68,202 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
+  const handleForgotSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    // Giả lập gọi API gửi email khôi phục
+    setTimeout(() => {
+      if (emailReset.includes('@')) {
+        setView('FORGOT_SUCCESS');
+      } else {
+        setError('Vui lòng nhập địa chỉ email hợp lệ.');
+      }
+      setIsLoading(false);
+    }, 1500);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans">
+    <div className="min-h-screen bg-[#0f172a] flex items-center justify-center p-4 font-sans relative overflow-hidden">
       {/* Background Decor */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-900/20 rounded-full blur-[120px]"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-900/20 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="bg-white dark:bg-slate-800 w-full max-w-[440px] rounded-3xl shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 relative z-10 animate-fade-in">
-        {/* Header Section */}
+      <div className="bg-white dark:bg-slate-800 w-full max-w-[440px] rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-700 relative z-10 transition-all duration-500">
+
+        {/* Top Branding Section */}
         <div className="pt-12 pb-8 px-8 text-center bg-gradient-to-b from-slate-50 to-white dark:from-slate-800 dark:to-slate-800 border-b dark:border-slate-700/50">
-          <div className="w-20 h-20 bg-blue-600 rounded-2xl mx-auto flex items-center justify-center mb-6 shadow-xl shadow-blue-500/30 transform -rotate-6 hover:rotate-0 transition-transform duration-300">
+          <div className="w-20 h-20 bg-blue-600 rounded-[2rem] mx-auto flex items-center justify-center mb-6 shadow-2xl shadow-blue-500/40 transform -rotate-6 hover:rotate-0 transition-all duration-300">
             <ShieldCheck size={40} className="text-white" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Chào Sếp CRM</h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">B2B Marketing & Automation</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+            {view === 'LOGIN' ? 'Chào Sếp CRM' : view === 'FORGOT_PASSWORD' ? 'Quên Mật Khẩu' : 'Đã Gửi Email'}
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
+            B2B Marketing & Automation
+          </p>
         </div>
 
-        {/* Form Section */}
-        <form onSubmit={handleSubmit} className="p-10 space-y-6">
-          {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 rounded-2xl flex items-start gap-3 animate-shake">
-              <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
-              <p className="text-sm text-red-600 dark:text-red-400 font-medium leading-relaxed">{error}</p>
-            </div>
+        <div className="p-10">
+          {view === 'LOGIN' && (
+            <form onSubmit={handleSubmit} className="space-y-6 animate-fade-in">
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-shake">
+                  <AlertCircle size={20} className="shrink-0" />
+                  <p className="text-sm font-bold">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tài khoản</label>
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-semibold text-sm transition-all"
+                    placeholder="Email hoặc Tên đăng nhập"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mật khẩu</label>
+                  <button
+                    type="button"
+                    onClick={() => setView('FORGOT_PASSWORD')}
+                    className="text-[10px] font-black text-blue-600 uppercase hover:underline"
+                  >
+                    Quên mật khẩu?
+                  </button>
+                </div>
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-semibold text-sm transition-all"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 p-1"
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2 space-y-4">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/20 active:scale-95 disabled:opacity-70 uppercase tracking-widest text-xs"
+                >
+                  {isLoading ? <Loader2 className="animate-spin" size={22} /> : 'Đăng Nhập Ngay'}
+                </button>
+              </div>
+            </form>
           )}
 
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Tài khoản</label>
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                <User size={20} />
-              </div>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none dark:text-white transition-all font-medium"
-                placeholder="Email hoặc tên đăng nhập"
-                required
-              />
-            </div>
-          </div>
+          {view === 'FORGOT_PASSWORD' && (
+            <form onSubmit={handleForgotSubmit} className="space-y-6 animate-slide-up">
+              <p className="text-sm text-slate-500 text-center leading-relaxed font-medium">
+                Vui lòng nhập địa chỉ email đã đăng ký. Chúng tôi sẽ gửi hướng dẫn khôi phục mật khẩu vào hòm thư của Sếp.
+              </p>
 
-          <div className="space-y-2">
-            <div className="flex justify-between items-center ml-1">
-              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Mật khẩu</label>
-              <a href="#" className="text-[11px] font-bold text-blue-600 hover:text-blue-700 uppercase tracking-tighter hover:underline">Quên mật khẩu?</a>
-            </div>
-            <div className="relative group">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                <Lock size={20} />
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-shake">
+                  <AlertCircle size={20} className="shrink-0" />
+                  <p className="text-sm font-bold">{error}</p>
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Địa chỉ Email</label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={20} />
+                  <input
+                    type="email"
+                    value={emailReset}
+                    onChange={(e) => setEmailReset(e.target.value)}
+                    className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none font-semibold text-sm transition-all"
+                    placeholder="vi-du@congty.com"
+                    required
+                  />
+                </div>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-12 pr-12 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none dark:text-white transition-all font-medium"
-                placeholder="••••••••"
-                required
-              />
+
+              <div className="pt-2 space-y-4">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-14 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-70 uppercase tracking-widest text-xs"
+                >
+                  {isLoading ? <Loader2 className="animate-spin" size={22} /> : (
+                    <>
+                      Gửi Yêu Cầu <Send size={18} />
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView('LOGIN')}
+                  className="w-full h-12 flex items-center justify-center gap-2 text-[10px] font-black text-slate-500 hover:text-slate-800 uppercase tracking-widest"
+                >
+                  <ArrowLeft size={16} /> Quay lại đăng nhập
+                </button>
+              </div>
+            </form>
+          )}
+
+          {view === 'FORGOT_SUCCESS' && (
+            <div className="text-center space-y-8 animate-fade-in">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600 shadow-inner">
+                <CheckCircle2 size={40} />
+              </div>
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-slate-800 dark:text-white">Kiểm tra hòm thư!</h3>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  Chúng tôi đã gửi đường dẫn đặt lại mật khẩu đến: <br />
+                  <strong className="text-slate-900 dark:text-slate-200">{emailReset}</strong>
+                </p>
+              </div>
+              <div className="p-4 bg-blue-50 dark:bg-slate-900/50 rounded-2xl border border-blue-100 dark:border-slate-700 text-left">
+                <p className="text-[10px] text-blue-700 dark:text-blue-400 font-bold leading-relaxed">
+                  * Nếu không thấy email, vui lòng kiểm tra thư mục Spam hoặc gửi lại yêu cầu sau 2 phút.
+                </p>
+              </div>
               <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors p-1"
-                tabIndex={-1}
+                onClick={() => { setView('LOGIN'); setEmailReset(''); }}
+                className="w-full h-14 bg-slate-900 hover:bg-black text-white font-black rounded-2xl transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                Trở về trang chủ
               </button>
             </div>
-          </div>
+          )}
+        </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full h-14 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-500/25 active:scale-[0.98] ${isLoading ? 'opacity-80 cursor-not-allowed' : ''}`}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="animate-spin" size={24} />
-                <span className="tracking-wide">Đang xác thực...</span>
-              </>
-            ) : (
-              <span className="tracking-wide text-lg">Đăng Nhập</span>
-            )}
-          </button>
-
-          <div className="text-center pt-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-900/50 rounded-full border border-slate-200 dark:border-slate-700">
-              <Globe size={14} className="text-blue-500" />
-              <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">chaosep.com</span>
-            </div>
+        {/* Footer Info */}
+        <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t dark:border-slate-700 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
+            <Globe size={14} className="text-blue-500" />
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">API Endpoint: secure.chaosep.com</span>
           </div>
-        </form>
+        </div>
       </div>
 
-      {/* Footer copyright */}
-      <div className="absolute bottom-8 text-slate-500 dark:text-slate-600 text-xs font-medium">
-        &copy; 2024 Chaos CRM. All rights reserved.
+      <div className="absolute bottom-8 flex items-center gap-3 text-slate-500 text-[10px] font-black uppercase tracking-widest">
+        <Terminal size={16} /> Senior CRM Engineer Framework v2.5
       </div>
     </div>
   );
