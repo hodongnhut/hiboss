@@ -17,7 +17,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
     setError(null);
 
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api'; // fallback nếu thiếu
+    const API_BASE = import.meta.env.VITE_API_BASE || '/api';
     const API_URL = `${API_BASE}/site/login`;
 
     try {
