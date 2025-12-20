@@ -117,7 +117,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               {user.username.charAt(0)}
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium truncate">{user.hoTen}</p>
+              <p className="text-sm font-medium truncate">{user.username}</p>
               <p className="text-[10px] text-slate-400 uppercase font-bold tracking-wider">{user.vaiTro}</p>
             </div>
           </div>
