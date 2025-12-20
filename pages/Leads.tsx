@@ -360,7 +360,7 @@ const Leads = () => {
                                             </div>
                                         </div>
                                         <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
-                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Người đại diện pháp luật</p>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Người đại diện pháp luật || MST</p>
                                             <p className="font-bold text-slate-700 dark:text-slate-300 uppercase">{selectedLead.nguoiLienHe || '-- ĐANG CẬP NHẬT --'}</p>
                                         </div>
                                         <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-3xl border border-slate-100 dark:border-slate-700">
