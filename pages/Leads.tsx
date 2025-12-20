@@ -207,7 +207,7 @@ const Leads = () => {
                                 <tr>
                                     <th className="px-6 py-4 w-[50px]"><button onClick={handleSelectAll} className="hover:text-blue-600">{selectedLeadIds.size > 0 && selectedLeadIds.size === leads.length ? <CheckSquare size={20} className="text-blue-600" /> : <Square size={20} />}</button></th>
                                     <th className="px-6 py-4">Doanh Nghiệp</th>
-                                    <th className="px-6 py-4">Mã Số Thuế / Liên Hệ</th>
+                                    <th className="px-6 py-4">Mã Số Thuế </th>
                                     <th className="px-6 py-4">Ngành Nghề</th>
                                     <th className="px-6 py-4">Tỉnh Thành</th>
                                     <th className="px-6 py-4">Thao Tác</th>
