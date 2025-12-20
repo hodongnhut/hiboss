@@ -69,7 +69,16 @@ export const fetchCompanies = async (
     pageSize: pageSize.toString(),
   });
 
-  if (search) params.append('company_name', search);
+  if (search) {
+    const trimmed = search.trim();
+
+    if (/^\d{10}(-\d{3})?$/.test(trimmed.replace(/[\s-]/g, ''))) {
+      params.append('tax_code', trimmed.replace(/[\s-]/g, ''));
+    } else {
+      params.append('company_name', trimmed);
+    }
+  }
+
   if (province && province !== 'ALL') params.append('province', province);
   if (industry && industry !== 'ALL') params.append('industry', industry);
   if (taxCode) params.append('tax_code', taxCode);
