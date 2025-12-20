@@ -93,10 +93,9 @@ export const fetchCompanies = async (
   });
 
   if (response.status === 401) {
-    // Token hết hạn hoặc sai → tự động logout
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
-    window.location.href = '/login'; // hoặc dùng navigate nếu có router
+    window.location.href = '/login';
     throw new Error('Phiên đăng nhập hết hạn. Đang chuyển về trang login...');
   }
 

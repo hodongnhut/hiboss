@@ -53,7 +53,7 @@ const Leads = () => {
                     tenCongTy: item.company_name,
                     email: item.email || '',
                     soDienThoai: item.phone || '',
-                    diaChi: item.address || item.province || 'Việt Nam',
+                    diaChi: item.province || 'Việt Nam',
                     nguoiLienHe: item.legal_representative || item.tax_code || 'Chưa rõ',
                     nganhNghe: item.industry || 'Khác',
                     trangThai: TrangThaiKhachHang.MOI,
@@ -209,7 +209,7 @@ const Leads = () => {
                                     <th className="px-6 py-4">Doanh Nghiệp</th>
                                     <th className="px-6 py-4">Mã Số Thuế / Liên Hệ</th>
                                     <th className="px-6 py-4">Ngành Nghề</th>
-                                    <th className="px-6 py-4">Địa Chỉ</th>
+                                    <th className="px-6 py-4">Tỉnh Thành</th>
                                     <th className="px-6 py-4">Thao Tác</th>
                                 </tr>
                             </thead>
