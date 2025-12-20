@@ -257,13 +257,9 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t dark:border-slate-700 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
             <Globe size={14} className="text-blue-500" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">API Endpoint: secure.chaosep.com</span>
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">make by StoneNetworkTech</span>
           </div>
         </div>
-      </div>
-
-      <div className="absolute bottom-8 flex items-center gap-3 text-slate-500 text-[10px] font-black uppercase tracking-widest">
-        <Terminal size={16} /> Senior CRM Engineer Framework v2.5
       </div>
     </div>
   );
