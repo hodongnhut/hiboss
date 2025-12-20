@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Upload, Search, Filter, MoreHorizontal, Users, Save, Share2, UserCheck, CheckSquare, Square, ChevronLeft, ChevronRight, Loader2, AlertCircle, MapPin, X } from 'lucide-react';
-import { danhSachUserMau, toChucHienTai } from '../services/mockData';
+import { toChucHienTai } from '../services/mockData';
 import { phanLoaiNganhNghe, fetchCompanies } from '../services/aiService';
 import { TrangThaiKhachHang, KhachHang, VaiTro } from '../types';
 
