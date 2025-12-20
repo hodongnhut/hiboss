@@ -18,7 +18,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setError(null);
 
     // Endpoint đi qua Vite Proxy (đã cấu hình trỏ đến https://api.chaosep.com)
-    const API_URL = '/api/site/login';
+    const API_URL = `${import.meta.env.VITE_API_BASE}/site/login`;
 
     try {
       const response = await fetch(API_URL, {
