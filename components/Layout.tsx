@@ -272,6 +272,16 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                 ))}
               </ul>
             </nav>
+            <div className="p-4 border-t border-slate-700">
+              <button
+                onClick={onLogout}
+                className="w-full flex items-center justify-center gap-2 p-2 rounded bg-slate-800 hover:bg-red-900/30 text-slate-300 hover:text-red-400 transition-colors text-sm"
+              >
+                <LogOut size={16} />
+                Đăng xuất
+              </button>
+            </div>
+
           </div>
           <div className="flex-1 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}></div>
         </div>

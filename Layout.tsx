@@ -21,6 +21,28 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
     { id: 'dev-specs', label: 'Backend Specs', icon: <Code size={20} /> },
   ];
 
+  // Phần footer chung (dùng cho cả desktop và mobile)
+  const UserFooter = () => (
+    <div className="p-4 border-t border-slate-700">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+          <span className="font-bold">AD</span>
+        </div>
+        <div>
+          <p className="text-sm font-medium">Admin User</p>
+          <p className="text-xs text-slate-400">admin@hisep.vn</p>
+        </div>
+      </div>
+      <button
+        onClick={onLogout}
+        className="w-full flex items-center justify-center gap-2 p-2 rounded bg-slate-800 hover:bg-red-900/30 text-slate-300 hover:text-red-400 transition-colors text-sm"
+      >
+        <LogOut size={16} />
+        Đăng xuất
+      </button>
+    </div>
+  );
+
   return (
     <div className="flex h-screen bg-gray-100 dark:bg-slate-900">
       {/* Sidebar Desktop */}
@@ -49,24 +71,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-slate-700">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
-              <span className="font-bold">AD</span>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-slate-400">admin@hisep.vn</p>
-            </div>
-          </div>
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center justify-center gap-2 p-2 rounded bg-slate-800 hover:bg-red-900/30 text-slate-300 hover:text-red-400 transition-colors text-sm"
-          >
-            <LogOut size={16} />
-            Đăng xuất
-          </button>
-        </div>
+        {/* Footer desktop */}
+        <UserFooter />
       </aside>
 
       {/* Main Content */}
@@ -106,13 +112,21 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="absolute inset-0 z-50 md:hidden flex">
-          <div className="w-64 bg-slate-900 h-full text-white p-4 shadow-xl">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-xl font-bold">HISep CRM</span>
-              <button onClick={() => setIsMobileMenuOpen(false)}><X /></button>
+          <div className="w-64 bg-slate-900 h-full text-white flex flex-col shadow-xl">
+            {/* Header mobile menu */}
+            <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">H</div>
+                <span className="text-xl font-bold tracking-tight">ChàoSếp CRM</span>
+              </div>
+              <button onClick={() => setIsMobileMenuOpen(false)}>
+                <X size={24} />
+              </button>
             </div>
-            <nav>
-              <ul className="space-y-2">
+
+            {/* Nav menu mobile */}
+            <nav className="flex-1 overflow-y-auto py-4">
+              <ul className="space-y-1 px-3">
                 {menuItems.map((item) => (
                   <li key={item.id}>
                     <button
@@ -120,7 +134,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                         onNavigate(item.id);
                         setIsMobileMenuOpen(false);
                       }}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg ${activePage === item.id ? 'bg-blue-600' : 'hover:bg-slate-800'
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activePage === item.id
+                        ? 'bg-blue-600 text-white font-medium'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
                         }`}
                     >
                       {item.icon}
@@ -130,7 +146,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                 ))}
               </ul>
             </nav>
+
+            {/* Footer mobile – ĐÃ THÊM VÀO ĐÂY */}
+            <UserFooter />
           </div>
+
+          {/* Overlay backdrop */}
           <div className="flex-1 bg-black/50" onClick={() => setIsMobileMenuOpen(false)}></div>
         </div>
       )}
