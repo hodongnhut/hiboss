@@ -149,6 +149,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
           </div>
 
           <div className="flex items-center gap-4">
+            <div className="h-8 px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center">
+              Số dư: 5,000,000 đ
+            </div>
             {/* Notification Bell */}
             <div className="relative" ref={notiRef}>
               <button
@@ -232,9 +235,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               )}
             </div>
 
-            <div className="h-8 px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center">
-              Số dư: 5,000,000 đ
-            </div>
+
           </div>
         </header>
 

@@ -37,8 +37,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                 <button
                   onClick={() => onNavigate(item.id)}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${activePage === item.id
-                      ? 'bg-blue-600 text-white font-medium'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-blue-600 text-white font-medium'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
                     }`}
                 >
                   {item.icon}
@@ -87,13 +87,13 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
           </div>
 
           <div className="flex items-center gap-4">
+            <div className="h-8 px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center">
+              Số dư: 5,000,000 đ
+            </div>
             <button className="relative p-2 text-slate-500 hover:text-blue-600 transition-colors">
               <Bell size={20} />
               <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
             </button>
-            <div className="h-8 px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium flex items-center">
-              Số dư: 5,000,000 đ
-            </div>
           </div>
         </header>
 
