@@ -240,7 +240,11 @@ const Leads = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <p className="font-mono font-bold text-blue-600 text-xs">{lead.nguoiLienHe}</p>
-                                            <p className="text-[10px] text-slate-500 mt-1">{lead.email || 'Chưa cập nhật email'}</p>
+                                            {lead.email && (
+                                                <p className="text-[10px] text-slate-500 mt-1">
+                                                    {lead.email}
+                                                </p>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded text-[10px] font-black uppercase tracking-tighter border border-slate-200 dark:border-slate-600">{lead.nganhNghe}</span>
