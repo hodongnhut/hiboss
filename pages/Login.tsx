@@ -263,7 +263,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               rel="noopener noreferrer"
               style={{ color: '#007bff' }}
             >
-              <span className="text-[10px] font-black text-slate-500 tracking-tighter">Make by StoneNetwork</span>
+              <span className="text-[10px] font-black text-slate-500 tracking-tighter">Make by StoneNetwork Company</span>
             </a>
 
           </div>
