@@ -247,7 +247,18 @@ const Leads = () => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded text-[10px] font-black uppercase tracking-tighter border border-slate-200 dark:border-slate-600">{lead.nganhNghe}</span>
+                                            {lead.nganhNghe && lead.nganhNghe.split(',').map((nganh: string, index: number) => {
+                                                const trimmedNganh = nganh.trim();
+                                                if (!trimmedNganh) return null;
+                                                return (
+                                                    <span
+                                                        key={index}
+                                                        className="inline-block px-2 py-1 mr-2 mb-2 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded text-[10px] font-black uppercase tracking-tighter border border-slate-200 dark:border-slate-600"
+                                                    >
+                                                        {trimmedNganh}
+                                                    </span>
+                                                );
+                                            })}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1.5 text-xs text-slate-500 max-w-[200px] truncate">
