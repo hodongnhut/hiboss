@@ -257,7 +257,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         <div className="p-8 bg-slate-50 dark:bg-slate-900/50 border-t dark:border-slate-700 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
             <Globe size={14} className="text-blue-500" />
-            <span className="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Stone Network</span>
+            <a
+              href="https://stonenetworktech.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#007bff' }}
+            >
+              <span className="text-[10px] font-black text-slate-500 tracking-tighter">Make by StoneNetwork</span>
+            </a>
+
           </div>
         </div>
       </div>
