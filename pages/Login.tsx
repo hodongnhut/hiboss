@@ -20,7 +20,8 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
     setError(null);
 
-    const API_URL = '/api/site/login';
+    const API_BASE = import.meta.env.VITE_API_BASE || '/api';
+    const API_URL = `${API_BASE}/site/login`;
 
     try {
       const response = await fetch(API_URL, {
