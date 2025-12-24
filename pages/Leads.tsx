@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Upload, Search, Filter, Users, ChevronDown, MoreHorizontal, Database, X, Check, MapPin, Loader2, Eye, Edit3, Trash2, Building2, Calendar, CreditCard, Phone, Mail, Globe, Briefcase, CheckSquare, Square, ChevronLeft, ChevronRight, Share2, Save } from 'lucide-react';
 import { danhSachUserMau, toChucHienTai } from '../services/mockData';
-import { phanLoaiNganhNghe, fetchCompanies, fetchProvinces } from '../services/aiService';
+import { phanLoaiNganhNghe, fetchCompanies, fetchProvinces, fetchDistricts } from '../services/aiService';
 import { TrangThaiKhachHang, KhachHang, VaiTro } from '../types';
 
 const Leads = () => {
@@ -19,6 +19,16 @@ const Leads = () => {
     const [isProvinceDropdownOpen, setIsProvinceDropdownOpen] = useState(false);
     const provinceRef = useRef<HTMLDivElement>(null);
 
+    // State dữ liệu Quận Huyện (Dropdown)
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [districtPage, setDistrictPage] = useState(1);
+    const [districtSearch, setDistrictSearch] = useState('');
+    const [loadingDistricts, setLoadingDistricts] = useState(false);
+    const [hasMoreDistricts, setHasMoreDistricts] = useState(true);
+    const [isDistrictDropdownOpen, setIsDistrictDropdownOpen] = useState(false);
+    const districtRef = useRef<HTMLDivElement>(null);
+    const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+
     // Pagination Server-side
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(50);
@@ -28,6 +38,7 @@ const Leads = () => {
     // Filter States
     const [searchTerm, setSearchTerm] = useState('');
     const [filterProvince, setFilterProvince] = useState('ALL');
+    const [filterDistrict, setFilterDistrict] = useState('ALL');
     const [filterIndustry, setFilterIndustry] = useState('ALL');
     const [filterStatus, setFilterStatus] = useState('ALL');
     const [filterSource, setFilterSource] = useState('ALL');
@@ -59,6 +70,39 @@ const Leads = () => {
         } finally {
             setLoadingProvinces(false);
         }
+    };
+
+    const loadDistricts = async (provinceId: number, page: number, search: string, append: boolean = false) => {
+        setLoadingDistricts(true);
+        try {
+            const res = await fetchDistricts(provinceId, page, 50, search);
+            if (res.success) {
+                setDistricts(prev => append ? [...prev, ...res.items] : res.items);
+                setHasMoreDistricts(res.page < res.totalPages);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingDistricts(false);
+        }
+    };
+
+    // Khi chọn tỉnh thành mới -> Reset Quận huyện
+    const handleProvinceSelect = (prov: any) => {
+        if (prov === 'ALL') {
+            setFilterProvince('ALL');
+            setFilterDistrict('ALL');
+            setSelectedProvinceId(null);
+            setDistricts([]);
+        } else {
+            setFilterProvince(prov.title);
+            setFilterDistrict('ALL');
+            setSelectedProvinceId(prov.id);
+            setDistrictPage(1);
+            setDistrictSearch('');
+            loadDistricts(prov.id, 1, '', false);
+        }
+        setIsProvinceDropdownOpen(false);
     };
 
     // Load dữ liệu từ API (Server-side filtering & pagination)
@@ -105,7 +149,7 @@ const Leads = () => {
 
     useEffect(() => {
         loadData();
-    }, [currentPage, pageSize, filterProvince, filterIndustry]);
+    }, [currentPage, pageSize, filterProvince, filterDistrict, filterIndustry]);
 
     // Theo dõi tìm kiếm tỉnh thành
     useEffect(() => {
@@ -115,6 +159,15 @@ const Leads = () => {
         }, 300);
         return () => clearTimeout(timer);
     }, [provinceSearch]);
+
+    useEffect(() => {
+        if (!selectedProvinceId) return;
+        const timer = setTimeout(() => {
+            setDistrictPage(1);
+            loadDistricts(selectedProvinceId, 1, districtSearch, false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [districtSearch, selectedProvinceId]);
 
     // Khi search, quay về trang 1 và delay gọi API (Debounce)
     useEffect(() => {
@@ -184,18 +237,18 @@ const Leads = () => {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
                         {/* Dropdown Khu Vực Thông Minh */}
                         <div className="space-y-2 relative" ref={provinceRef}>
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Khu vực (Province)</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Tỉnh / Thành</label>
                             <button
                                 onClick={() => setIsProvinceDropdownOpen(!isProvinceDropdownOpen)}
                                 className="w-full flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-left"
                             >
                                 <span className="truncate">{filterProvince === 'ALL' ? 'Tất cả tỉnh thành' : filterProvince}</span>
-                                <ChevronDown size={18} className={`transition-transform ${isProvinceDropdownOpen ? 'rotate-180' : ''}`} />
+                                <ChevronDown size={18} className={`transition-transform shrink-0 ml-2 ${isProvinceDropdownOpen ? 'rotate-180' : ''}`} />
                             </button>
 
                             {isProvinceDropdownOpen && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden animate-slide-up max-h-[400px] flex flex-col">
-                                    <div className="border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-slide-up max-h-[400px] flex flex-col">
+                                    <div className="p-3 border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
                                         <div className="relative">
                                             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                                             <input
@@ -209,7 +262,7 @@ const Leads = () => {
                                     </div>
                                     <div className="overflow-y-auto flex-1 custom-scrollbar">
                                         <button
-                                            onClick={() => { setFilterProvince('ALL'); setIsProvinceDropdownOpen(false); }}
+                                            onClick={() => handleProvinceSelect('ALL')}
                                             className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterProvince === 'ALL' ? 'text-blue-600 bg-blue-50' : ''}`}
                                         >
                                             Tất cả tỉnh thành
@@ -217,7 +270,7 @@ const Leads = () => {
                                         {provinces.map(prov => (
                                             <button
                                                 key={prov.id}
-                                                onClick={() => { setFilterProvince(prov.title); setIsProvinceDropdownOpen(false); }}
+                                                onClick={() => handleProvinceSelect(prov)}
                                                 className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterProvince === prov.title ? 'text-blue-600 bg-blue-50' : ''}`}
                                             >
                                                 <div className="flex justify-between items-center">
@@ -235,6 +288,68 @@ const Leads = () => {
                                                     const next = provincePage + 1;
                                                     setProvincePage(next);
                                                     loadProvinces(next, provinceSearch, true);
+                                                }}
+                                                className="w-full py-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-slate-50 border-t dark:border-slate-700"
+                                            >
+                                                Tải thêm...
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Dropdown Quận / Huyện (Phụ thuộc vào Tỉnh thành) */}
+                        <div className="space-y-2 relative" ref={districtRef}>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Quận / Huyện</label>
+                            <button
+                                onClick={() => selectedProvinceId && setIsDistrictDropdownOpen(!isDistrictDropdownOpen)}
+                                disabled={!selectedProvinceId}
+                                className={`w-full flex justify-between items-center p-4 border rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-left ${!selectedProvinceId ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed' : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700'}`}
+                            >
+                                <span className="truncate">{filterDistrict === 'ALL' ? 'Tất cả quận huyện' : filterDistrict}</span>
+                                <ChevronDown size={18} className={`transition-transform shrink-0 ml-2 ${isDistrictDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isDistrictDropdownOpen && selectedProvinceId && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-slide-up max-h-[400px] flex flex-col">
+                                    <div className="p-3 border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                                        <div className="relative">
+                                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <input
+                                                type="text"
+                                                placeholder="Tìm quận huyện..."
+                                                value={districtSearch}
+                                                onChange={e => setDistrictSearch(e.target.value)}
+                                                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="overflow-y-auto flex-1 custom-scrollbar">
+                                        <button
+                                            onClick={() => { setFilterDistrict('ALL'); setIsDistrictDropdownOpen(false); }}
+                                            className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterDistrict === 'ALL' ? 'text-blue-600 bg-blue-50' : ''}`}
+                                        >
+                                            Tất cả quận huyện
+                                        </button>
+                                        {districts.map(dist => (
+                                            <button
+                                                key={dist.id}
+                                                onClick={() => { setFilterDistrict(dist.title); setIsDistrictDropdownOpen(false); }}
+                                                className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterDistrict === dist.title ? 'text-blue-600 bg-blue-50' : ''}`}
+                                            >
+                                                <span>{dist.title}</span>
+                                            </button>
+                                        ))}
+                                        {loadingDistricts && (
+                                            <div className="p-4 flex justify-center"><Loader2 className="animate-spin text-blue-600" size={20} /></div>
+                                        )}
+                                        {hasMoreDistricts && !loadingDistricts && (
+                                            <button
+                                                onClick={() => {
+                                                    const next = districtPage + 1;
+                                                    setDistrictPage(next);
+                                                    loadDistricts(selectedProvinceId, next, districtSearch, true);
                                                 }}
                                                 className="w-full py-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-slate-50 border-t dark:border-slate-700"
                                             >

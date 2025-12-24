@@ -138,3 +138,36 @@ export const fetchProvinces = async (page: number = 1, pageSize: number = 20, se
     };
   }
 };
+
+
+export const fetchDistricts = async (provinceId: number, page: number = 1, pageSize: number = 50, search?: string): Promise<ApiResponse> => {
+  const token = getAuthToken();
+  const params = new URLSearchParams({
+    province_id: provinceId.toString(),
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+  });
+  if (search) params.append('title', search);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/district?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('API_ERROR');
+    return await response.json();
+  } catch (err) {
+    console.error('Fetch Districts Error:', err);
+    return {
+      success: false,
+      message: 'Error',
+      total: 0,
+      page: 1,
+      pageSize: 50,
+      totalPages: 0,
+      items: []
+    };
+  }
+};
