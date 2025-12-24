@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
-import { Upload, Search, Filter, Users, MoreHorizontal, Database, X, Check, MapPin, Loader2, Eye, Edit3, Trash2, Building2, Calendar, CreditCard, Phone, Mail, Globe, Briefcase, CheckSquare, Square, ChevronLeft, ChevronRight, Share2, Save } from 'lucide-react';
+import { Upload, Search, Filter, Users, ChevronDown, MoreHorizontal, Database, X, Check, MapPin, Loader2, Eye, Edit3, Trash2, Building2, Calendar, CreditCard, Phone, Mail, Globe, Briefcase, CheckSquare, Square, ChevronLeft, ChevronRight, Share2, Save } from 'lucide-react';
 import { danhSachUserMau, toChucHienTai } from '../services/mockData';
-import { phanLoaiNganhNghe, fetchCompanies } from '../services/aiService';
+import { phanLoaiNganhNghe, fetchCompanies, fetchProvinces } from '../services/aiService';
 import { TrangThaiKhachHang, KhachHang, VaiTro } from '../types';
 
 const Leads = () => {
@@ -9,6 +9,15 @@ const Leads = () => {
     const [leads, setLeads] = useState<KhachHang[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // State dữ liệu Tỉnh Thành (Dropdown)
+    const [provinces, setProvinces] = useState<any[]>([]);
+    const [provincePage, setProvincePage] = useState(1);
+    const [provinceSearch, setProvinceSearch] = useState('');
+    const [loadingProvinces, setLoadingProvinces] = useState(false);
+    const [hasMoreProvinces, setHasMoreProvinces] = useState(true);
+    const [isProvinceDropdownOpen, setIsProvinceDropdownOpen] = useState(false);
+    const provinceRef = useRef<HTMLDivElement>(null);
 
     // Pagination Server-side
     const [currentPage, setCurrentPage] = useState(1);
@@ -36,6 +45,21 @@ const Leads = () => {
     const [selectedAgentIds, setSelectedAgentIds] = useState<Set<string>>(new Set());
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const loadProvinces = async (page: number, search: string, append: boolean = false) => {
+        setLoadingProvinces(true);
+        try {
+            const res = await fetchProvinces(page, 20, search);
+            if (res.success) {
+                setProvinces(prev => append ? [...prev, ...res.items] : res.items);
+                setHasMoreProvinces(res.page < res.totalPages);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingProvinces(false);
+        }
+    };
 
     // Load dữ liệu từ API (Server-side filtering & pagination)
     const loadData = async () => {
@@ -82,6 +106,15 @@ const Leads = () => {
     useEffect(() => {
         loadData();
     }, [currentPage, pageSize, filterProvince, filterIndustry]);
+
+    // Theo dõi tìm kiếm tỉnh thành
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setProvincePage(1);
+            loadProvinces(1, provinceSearch, false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [provinceSearch]);
 
     // Khi search, quay về trang 1 và delay gọi API (Debounce)
     useEffect(() => {
@@ -149,13 +182,70 @@ const Leads = () => {
             {isFilterOpen && (
                 <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-blue-100 dark:border-slate-700 shadow-xl animate-fade-in">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                        <div className="space-y-2">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Khu vực (Tỉnh/Thành)</label>
-                            <select value={filterProvince} onChange={(e) => setFilterProvince(e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
-                                <option value="ALL">Tất cả tỉnh thành</option>
-                                {uniqueCities.map(city => <option key={city} value={city}>{city}</option>)}
-                            </select>
+                        {/* Dropdown Khu Vực Thông Minh */}
+                        <div className="space-y-2 relative" ref={provinceRef}>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Khu vực (Province)</label>
+                            <button
+                                onClick={() => setIsProvinceDropdownOpen(!isProvinceDropdownOpen)}
+                                className="w-full flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-left"
+                            >
+                                <span className="truncate">{filterProvince === 'ALL' ? 'Tất cả tỉnh thành' : filterProvince}</span>
+                                <ChevronDown size={18} className={`transition-transform ${isProvinceDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isProvinceDropdownOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden animate-slide-up max-h-[400px] flex flex-col">
+                                    <div className="border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                                        <div className="relative">
+                                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <input
+                                                type="text"
+                                                placeholder="Tìm tỉnh thành..."
+                                                value={provinceSearch}
+                                                onChange={e => setProvinceSearch(e.target.value)}
+                                                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="overflow-y-auto flex-1 custom-scrollbar">
+                                        <button
+                                            onClick={() => { setFilterProvince('ALL'); setIsProvinceDropdownOpen(false); }}
+                                            className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterProvince === 'ALL' ? 'text-blue-600 bg-blue-50' : ''}`}
+                                        >
+                                            Tất cả tỉnh thành
+                                        </button>
+                                        {provinces.map(prov => (
+                                            <button
+                                                key={prov.id}
+                                                onClick={() => { setFilterProvince(prov.title); setIsProvinceDropdownOpen(false); }}
+                                                className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterProvince === prov.title ? 'text-blue-600 bg-blue-50' : ''}`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span>{prov.title}</span>
+                                                    <span className="text-[9px] text-slate-400 font-black">({prov.total_doanh_nghiep?.toLocaleString()} cty)</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                        {loadingProvinces && (
+                                            <div className="p-4 flex justify-center"><Loader2 className="animate-spin text-blue-600" size={20} /></div>
+                                        )}
+                                        {hasMoreProvinces && !loadingProvinces && (
+                                            <button
+                                                onClick={() => {
+                                                    const next = provincePage + 1;
+                                                    setProvincePage(next);
+                                                    loadProvinces(next, provinceSearch, true);
+                                                }}
+                                                className="w-full py-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-slate-50 border-t dark:border-slate-700"
+                                            >
+                                                Tải thêm...
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
+
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngành nghề</label>
                             <select value={filterIndustry} onChange={(e) => setFilterIndustry(e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-semibold">

@@ -6,22 +6,19 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://46.250.237.192',  // Không cần https nếu backend http
+        target: 'https://api.chaosep.com',
         changeOrigin: true,
-        secure: false,  // Bỏ check SSL nếu có
-        rewrite: (path) => path.replace(/^\/api/, ''),  // Bỏ /api → /site/login
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
-            console.error('Proxy Error:', err);
+        secure: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('Proxy Error (Production):', err);
           });
-          proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('>>> Proxy Request:', req.method, req.url, '->', proxyReq.path);
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('>>> Proxying to Production:', req.method, req.url);
           });
-          proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('<<< Proxy Response:', proxyRes.statusCode, req.url);
-            if (proxyRes.statusCode === 301 || proxyRes.statusCode === 302) {
-              console.log('Redirect Location:', proxyRes.headers.location);
-            }
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('<<< Response from Production:', proxyRes.statusCode, req.url);
           });
         },
       },
