@@ -12,10 +12,13 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
-            console.log('Proxy Error:', err);
+            console.log('Proxy Error (Production):', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            proxyReq.setHeader('Origin', 'https://api.chaosep.com');
+            console.log('>>> Proxying to Production:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, _res) => {
+            console.log('<<< Response from Production:', proxyRes.statusCode, req.url);
           });
         },
       },

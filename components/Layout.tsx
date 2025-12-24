@@ -33,6 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
     setIsNotiOpen(!isNotiOpen);
   };
 
+  // Đóng thông báo khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (notiRef.current && !notiRef.current.contains(event.target as Node)) {
@@ -92,7 +93,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white shadow-lg shrink-0">
               H
             </div>
-            <div className={`transition-opacity duration-300 ${isSidebarHovered ? 'opacity-100' : 'opacity-0'}`}>
+            <div className={`transition-all duration-300 ${isSidebarHovered ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 pointer-events-none'}`}>
               <span className="text-lg font-black tracking-tighter whitespace-nowrap">ChàoSếp. CRM</span>
             </div>
           </div>
@@ -122,7 +123,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                       {item.label}
                     </span>
 
-                    {/* Tooltip for small state */}
+                    {/* Tooltip khi Sidebar đang thu nhỏ */}
                     {!isSidebarHovered && (
                       <div className="absolute left-full ml-4 px-3 py-2 bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 shadow-xl border border-slate-700">
                         {item.label}
@@ -135,7 +136,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
           </ul>
         </nav>
 
-        {/* User Profile & Logout Section */}
+        {/* User Profile Section */}
         <div className="p-4 border-t border-slate-700 bg-slate-900/50">
           <div className={`flex items-center gap-3 mb-4 overflow-hidden transition-all duration-300 ${isSidebarHovered ? 'px-2' : 'justify-center'}`}>
             <div className={`w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white shadow-lg shrink-0 transition-transform duration-300 ${!isSidebarHovered ? 'scale-90' : ''}`}>
@@ -151,7 +152,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
             onClick={onLogout}
             className={`w-full flex items-center transition-all duration-300 rounded-xl bg-slate-800 hover:bg-red-600/20 text-slate-400 hover:text-red-500 font-black uppercase text-[10px] tracking-widest ${isSidebarHovered ? 'px-4 py-3 justify-start gap-3' : 'p-3 justify-center'
               }`}
-            title="Đăng xuất"
           >
             <LogOut size={18} />
             <span className={`transition-opacity duration-300 whitespace-nowrap ${isSidebarHovered ? 'opacity-100' : 'opacity-0 hidden'}`}>
@@ -173,7 +173,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               <Menu size={24} />
             </button>
             <div className="flex items-center gap-2">
-              <span className="font-black text-lg text-slate-800 dark:text-white uppercase tracking-tighter">ChàoSếp.</span>
+              <Sparkles className="text-blue-500 hidden sm:block" size={20} />
+              <span className="font-black text-lg text-slate-800 dark:text-white uppercase tracking-tighter">CRM Automation</span>
             </div>
           </div>
 
@@ -187,7 +188,8 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
             <div className="hidden sm:flex h-9 px-4 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-xl text-[10px] font-black items-center border border-blue-100 dark:border-blue-800/30 uppercase tracking-widest">
               SỐ DƯ: 5,000,000 đ
             </div>
-            {/* Notification Bell */}
+
+            {/* Notification Bell Component */}
             <div className="relative" ref={notiRef}>
               <button
                 onClick={handleNotificationClick}
@@ -201,9 +203,9 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                 )}
               </button>
 
-              {/* Dropdown */}
+              {/* Notification Dropdown Menu */}
               {isNotiOpen && (
-                <div className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-[70] animate-slide-up origin-top-right">
+                <div className="absolute right-0 top-full mt-3 w-80 sm:w-96 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden z-[100] animate-slide-up origin-top-right">
                   <div className="flex justify-between items-center p-5 border-b dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
                     <h3 className="font-black text-[10px] uppercase tracking-widest text-slate-500 dark:text-slate-400">Thông báo mới</h3>
                     {unreadCount > 0 && (
@@ -230,13 +232,21 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                       <div className="p-12 text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">Không có thông báo mới</div>
                     )}
                   </div>
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/50 border-t dark:border-slate-700 text-center">
+                    <button
+                      onClick={() => { onNavigate('notifications'); setIsNotiOpen(false); }}
+                      className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:text-blue-600"
+                    >
+                      Xem tất cả thông báo
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </header>
 
-        {/* Page Content */}
+        {/* Page Content Body */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 dark:bg-slate-900/50 custom-scrollbar relative">
           <div className="mx-auto">
             {children}
@@ -247,16 +257,12 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
       {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-[100] md:hidden">
-          {/* Backdrop */}
           <div
             className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity"
             onClick={() => setIsMobileMenuOpen(false)}
           ></div>
-
-          {/* Sidebar Drawer */}
           <div className="absolute left-0 top-0 bottom-0 w-80 bg-slate-900 shadow-2xl flex flex-col animate-slide-right overflow-hidden">
-            {/* Header */}
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0 bg-slate-900/50">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black text-white shadow-lg">H</div>
                 <span className="text-xl font-black text-white tracking-tighter uppercase">ChàoSếp.</span>
@@ -269,7 +275,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               </button>
             </div>
 
-            {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-6 custom-scrollbar">
               <ul className="space-y-2 px-4">
                 {menuItems.map((item) => (
@@ -280,11 +285,11 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                         setIsMobileMenuOpen(false);
                       }}
                       className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl transition-all font-black text-sm tracking-tight ${activePage === item.id
-                        ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/30 scale-[1.02] uppercase'
+                        ? 'bg-blue-600 text-white shadow-2xl shadow-blue-600/30 uppercase'
                         : 'text-slate-400 hover:text-white hover:bg-slate-800'
                         }`}
                     >
-                      <span className={`${activePage === item.id ? 'text-white' : 'text-slate-500'}`}>{item.icon}</span>
+                      {item.icon}
                       {item.label}
                     </button>
                   </li>
@@ -292,7 +297,6 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               </ul>
             </nav>
 
-            {/* Footer */}
             <div className="mt-auto p-6 bg-slate-800/50 border-t border-slate-800 shrink-0">
               <div className="flex items-center gap-3 mb-6 p-4 bg-slate-900/50 rounded-3xl border border-slate-700/50">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-black text-white shadow-xl">
@@ -309,7 +313,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
                   onLogout?.();
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white transition-all font-black uppercase text-[10px] tracking-[0.2em] border border-red-600/20 shadow-lg active:scale-95"
+                className="w-full h-14 flex items-center justify-center gap-3 rounded-2xl bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white transition-all font-black uppercase text-[10px] tracking-[0.2em] border border-red-600/20"
               >
                 <LogOut size={18} />
                 Đăng xuất
