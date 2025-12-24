@@ -8,14 +8,13 @@ export default defineConfig({
       '/api': {
         target: 'https://api.chaosep.com',
         changeOrigin: true,
-        secure: false, // Bỏ qua kiểm tra chứng chỉ SSL để tránh lỗi kết nối trong môi trường sandbox
+        secure: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
             console.log('Proxy Error:', err);
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
-            // Thêm các Header cần thiết nếu Backend yêu cầu
             proxyReq.setHeader('Origin', 'https://api.chaosep.com');
           });
         },
