@@ -20,8 +20,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
     setError(null);
 
-    const API_BASE = import.meta.env.VITE_API_BASE || '/api';
-    const API_URL = `${API_BASE}/site/login`;
+    const API_URL = '/api/site/login';
 
     try {
       const response = await fetch(API_URL, {
@@ -73,7 +72,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
     setError(null);
 
-    // Giả lập gọi API gửi email khôi phục
     setTimeout(() => {
       if (emailReset.includes('@')) {
         setView('FORGOT_SUCCESS');

@@ -1,15 +1,14 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
       '/api': {
         target: 'https://api.chaosep.com',
-        changeOrigin: true, // Bắt buộc phải true để bypass các filter Host header trên Production
-        secure: true,      // Production dùng HTTPS nên để true
+        changeOrigin: true,
+        secure: true,
         rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy, _options) => {
           proxy.on('error', (err, _req, _res) => {
