@@ -1,7 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Upload, Search, Filter, Users, ChevronDown, MoreHorizontal, Database, X, Check, MapPin, Loader2, Eye, Edit3, Trash2, Building2, Calendar, CreditCard, Phone, Mail, Globe, Briefcase, CheckSquare, Square, ChevronLeft, ChevronRight, Share2, Save } from 'lucide-react';
 import { danhSachUserMau, toChucHienTai } from '../services/mockData';
-import { phanLoaiNganhNghe, fetchCompanies, fetchProvinces, fetchDistricts } from '../services/aiService';
+import { phanLoaiNganhNghe, fetchCompanies, fetchProvinces, fetchDistricts, fetchIndustries } from '../services/aiService';
 import { TrangThaiKhachHang, KhachHang, VaiTro } from '../types';
 
 const Leads = () => {
@@ -28,6 +28,16 @@ const Leads = () => {
     const [isDistrictDropdownOpen, setIsDistrictDropdownOpen] = useState(false);
     const districtRef = useRef<HTMLDivElement>(null);
     const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+
+    // State dữ liệu Ngành Nghề (Dropdown)
+    const [industries, setIndustries] = useState<any[]>([]);
+    const [industryPage, setIndustryPage] = useState(1);
+    const [industrySearch, setIndustrySearch] = useState('');
+    const [loadingIndustries, setLoadingIndustries] = useState(false);
+    const [hasMoreIndustries, setHasMoreIndustries] = useState(true);
+    const [isIndustryDropdownOpen, setIsIndustryDropdownOpen] = useState(false);
+    const industryDropdownRef = useRef<HTMLDivElement>(null);
+
 
     // Pagination Server-side
     const [currentPage, setCurrentPage] = useState(1);
@@ -86,6 +96,23 @@ const Leads = () => {
             setLoadingDistricts(false);
         }
     };
+
+    // Load danh sách ngành nghề
+    const loadIndustries = async (page: number, search: string, append: boolean = false) => {
+        setLoadingIndustries(true);
+        try {
+            const res = await fetchIndustries(page, 50, search);
+            if (res.success) {
+                setIndustries(prev => append ? [...prev, ...res.items] : res.items);
+                setHasMoreIndustries(res.page < res.totalPages);
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            setLoadingIndustries(false);
+        }
+    };
+
 
     // Khi chọn tỉnh thành mới -> Reset Quận huyện
     const handleProvinceSelect = (prov: any) => {
@@ -168,6 +195,16 @@ const Leads = () => {
         }, 300);
         return () => clearTimeout(timer);
     }, [districtSearch, selectedProvinceId]);
+
+    // Theo dõi tìm kiếm ngành nghề
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIndustryPage(1);
+            loadIndustries(1, industrySearch, false);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [industrySearch]);
+
 
     // Khi search, quay về trang 1 và delay gọi API (Debounce)
     useEffect(() => {
@@ -361,16 +398,71 @@ const Leads = () => {
                             )}
                         </div>
 
-                        <div className="space-y-2">
+
+                        {/* Dropdown Ngành Nghề Thông Minh */}
+                        <div className="space-y-2 relative" ref={industryDropdownRef}>
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Ngành nghề</label>
-                            <select value={filterIndustry} onChange={(e) => setFilterIndustry(e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-semibold">
-                                <option value="ALL">Tất cả ngành nghề</option>
-                                <option value="Xây dựng">Xây dựng</option>
-                                <option value="Công nghệ thông tin">Công nghệ thông tin</option>
-                                <option value="Làm đẹp / Spa">Làm đẹp / Spa</option>
-                                <option value="Bất động sản">Bất động sản</option>
-                            </select>
+                            <button
+                                onClick={() => setIsIndustryDropdownOpen(!isIndustryDropdownOpen)}
+                                className="w-full flex justify-between items-center p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-500/10 transition-all text-left"
+                            >
+                                <span className="truncate">{filterIndustry === 'ALL' ? 'Tất cả ngành nghề' : filterIndustry}</span>
+                                <ChevronDown size={18} className={`transition-transform shrink-0 ml-2 ${isIndustryDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isIndustryDropdownOpen && (
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[60] overflow-hidden animate-slide-up max-h-[400px] flex flex-col">
+                                    <div className="p-3 border-b dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
+                                        <div className="relative">
+                                            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                                            <input
+                                                type="text"
+                                                placeholder="Tìm ngành nghề..."
+                                                value={industrySearch}
+                                                onChange={e => setIndustrySearch(e.target.value)}
+                                                className="w-full pl-9 pr-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:ring-2 focus:ring-blue-500/20 outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="overflow-y-auto flex-1 custom-scrollbar">
+                                        <button
+                                            onClick={() => { setFilterIndustry('ALL'); setIsIndustryDropdownOpen(false); }}
+                                            className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterIndustry === 'ALL' ? 'text-blue-600 bg-blue-50' : ''}`}
+                                        >
+                                            Tất cả ngành nghề
+                                        </button>
+                                        {industries.map(ind => (
+                                            <button
+                                                key={ind.id}
+                                                onClick={() => { setFilterIndustry(ind.title); setIsIndustryDropdownOpen(false); }}
+                                                className={`w-full text-left px-5 py-3 text-xs font-bold hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors ${filterIndustry === ind.title ? 'text-blue-600 bg-blue-50' : ''}`}
+                                            >
+                                                <div className="flex justify-between items-center">
+                                                    <span className="truncate pr-2">{ind.title}</span>
+                                                    <span className="text-[9px] text-slate-400 font-black shrink-0">({ind.total_doanh_nghiep?.toLocaleString()} cty)</span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                        {loadingIndustries && (
+                                            <div className="p-4 flex justify-center"><Loader2 className="animate-spin text-blue-600" size={20} /></div>
+                                        )}
+                                        {hasMoreIndustries && !loadingIndustries && (
+                                            <button
+                                                onClick={() => {
+                                                    const next = industryPage + 1;
+                                                    setIndustryPage(next);
+                                                    loadIndustries(next, industrySearch, true);
+                                                }}
+                                                className="w-full py-3 text-[10px] font-black text-blue-600 uppercase tracking-widest hover:bg-slate-50 border-t dark:border-slate-700"
+                                            >
+                                                Tải thêm...
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
+
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Trạng thái CRM</label>
                             <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} className="w-full p-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 font-semibold">

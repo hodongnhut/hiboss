@@ -171,3 +171,35 @@ export const fetchDistricts = async (provinceId: number, page: number = 1, pageS
     };
   }
 };
+
+// API lấy danh sách ngành nghề
+export const fetchIndustries = async (page: number = 1, pageSize: number = 50, search?: string): Promise<ApiResponse> => {
+  const token = getAuthToken();
+  const params = new URLSearchParams({
+    page: page.toString(),
+    pageSize: pageSize.toString(),
+  });
+  if (search) params.append('title', search);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/industry/index?${params.toString()}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json',
+      },
+    });
+    if (!response.ok) throw new Error('API_ERROR');
+    return await response.json();
+  } catch (err) {
+    console.error('Fetch Industries Error:', err);
+    return {
+      success: false,
+      message: 'Error',
+      total: 0,
+      page: 1,
+      pageSize: 50,
+      totalPages: 0,
+      items: []
+    };
+  }
+};
