@@ -173,8 +173,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
               <Menu size={24} />
             </button>
             <div className="flex items-center gap-2">
-              <Sparkles className="text-blue-500 hidden sm:block" size={20} />
-              <span className="font-black text-lg text-slate-800 dark:text-white uppercase tracking-tighter">CRM Automation</span>
+              <span className="font-black text-lg text-slate-800 dark:text-white uppercase tracking-tighter">ChàoSếp.</span>
             </div>
           </div>
 
@@ -239,7 +238,7 @@ const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate, onLog
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-slate-50 dark:bg-slate-900/50 custom-scrollbar relative">
-          <div className="max-w-7xl mx-auto">
+          <div className="mx-auto">
             {children}
           </div>
         </main>
